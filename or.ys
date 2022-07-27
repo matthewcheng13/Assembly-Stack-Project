@@ -1,0 +1,1138 @@
+.pos 0x0
+
+main:
+    irmovl  stack, %esp
+    irmovl  input, %esi
+    irmovl  output, %edi
+
+mainloop:
+    mrmovl  (%esi), %ecx
+
+    irmovl  $0, %edx
+    addl    %ecx, %edx
+    je      end
+
+neg:
+
+square:
+
+rfact:
+
+status:
+
+end:
+
+
+comp:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+
+    irmovl  $0, %eax
+    subl    %edi, %eax
+    subl    %$1, %eax
+
+    popl    %edi
+
+    popl    %ebp
+
+    ret
+
+neg:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+
+    irmovl  $0, %eax
+    subl    %edi, %eax
+
+    popl    %edi
+
+    popl    %ebp
+
+    ret
+
+or:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    movl    8(%ebp), %edi
+    movl    12(%ebp), %ebx
+    movl    %edi, (%esp)
+    call    comp
+    something
+
+    movl    %ebx, (%esp)
+    call    comp
+    something
+
+    andl    %something, %something else
+
+    call    comp
+
+    popl    %edi
+
+    popl    %ebp
+
+rmult:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    movl    8(%ebp), %edi
+    movl    12(%ebp), %ebx
+
+    irmovl  $1, %eax
+    subl    %ebx, %eax
+    jne     x
+
+    call    rmult
+
+    return  x
+x:
+
+
+
+square:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+    jge     square2
+    
+    call    neg
+
+square2:
+    movl    %eax, 4(%esp)
+    movl    %eax, (%esp)
+    call    rmult
+    leave
+    ret
+
+
+rfact:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    call    rfact
+
+    ret
+
+rshift:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    call    rshift
+
+    ret
+
+setbit:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+
+    call    rshift
+
+    call    or
+
+    ret
+
+%eax
+%ebx
+%ecx
+%edx
+%edi
+%esi
+%esp
+%ebp
+
+.align 4
+
+input:
+.long 4
+.long -9
+.long 13
+
+output:
+
+.pos 0x400
+stack:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.pos 0x0
+
+main:
+    irmovl  stack, %esp
+    irmovl  input, %esi
+    irmovl  output, %edi
+
+mainloop:
+    mrmovl  (%esi), %ecx
+
+    irmovl  $0, %edx
+    addl    %ecx, %edx
+    je      end
+
+    # add value of input to output
+    rmmovl  %ecx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+mainneg:
+    # call neg on input and add to output 
+    rrmovl  %ecx, %ebx
+    pushl   %ebx
+    pushl   %ebx
+
+    call    neg
+
+    popl    %ebx
+    popl    %ebx
+
+    rmmovl  %ebx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+mainsquare:
+    # call square on input and add to output
+    rrmovl  %ecx, %ebx
+    pushl   %ebx
+    pushl   %ebx
+
+    call    square
+
+    popl    %ebx
+    popl    %ebx
+    
+    rmmovl  %ebx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+num2:
+    # if num2 is negative, call neg on it
+    rrmovl  %ecx, %ebx
+    irmovl  $0, %eax
+    subl    %ebx, %eax
+    jle     mainrfact
+
+    pushl   %ebx
+    pushl   %ebx
+
+    call    neg
+
+    popl    %ebx
+    popl    %ebx
+
+mainrfact:
+    # call rfact on num2 and add to output
+
+    pushl   %ebx
+    pushl   %ebx
+
+    call    rfact
+
+    popl    %ebx
+    popl    %ebx
+
+    rmmovl  %ebx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+status:
+    # set status to 0
+    irmovl  $0, %ebx
+
+status1prep:
+    # if num is odd, add one to status
+    irmovl  $1, %eax
+    andl    %ecx, %eax
+    je      status2prep
+
+status1:
+    irmovl  $1, %eax
+    addl    %eax, %ebx
+
+status2prep:
+    # if num is negative, add two to status
+    irmovl  $0, %eax
+    addl    %ecx, %eax
+    jge     status3prep
+
+status2:
+    irmovl  $2, %eax
+    addl    %eax, %ebx
+
+status3prep:
+    # call square on num
+    # if num squared is greater than 100, add four to status
+    rrmovl  %ecx, %eax
+
+    pushl   %eax
+    pushl   %eax
+
+    call    square
+
+    popl    %eax
+    popl    %eax
+    irmovl  $64, %edx
+    subl    %eax, %edx
+    jge     status4
+
+status3:
+    irmovl  $4, %eax
+    addl    %eax, %ebx
+
+status4:
+    # add 8 to status
+    irmovl  $8, %eax
+    addl    %eax, %ebx
+    
+    # add status to output
+    # add line of hex 1's to output
+    rmmovl  %ebx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+
+endloop:
+addl    %edx, %esi      # set new input address
+addl    %edx, %edi      # increment address in output
+
+jmp     mainloop
+
+end:
+    halt
+
+neg:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi   #int x
+
+    irmovl  $0, %eax        #int y = 0
+    subl    %edi, %eax      #y = y - x
+
+    popl    %edi
+
+    popl    %ebp
+
+    ret                     #return y
+
+rmult:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi            
+    pushl   %ebx            
+
+    mrmovl  8(%ebp), %edi   #int x
+    mrmovl  12(%ebp), %ebx  #int y
+
+    irmovl  $1, %eax
+    subl    %ebx, %eax      #int z = 1 - y
+    jne     elsermult       #if z == 0
+    rrmovl  %edi, %eax      #result = x
+    jmp     endrmult
+
+elsermult:
+    irmovl  $1, %eax        #else
+    subl    %eax, %ebx      
+    
+    pushl   %ebx
+    pushl   %ebx
+    pushl   %edi
+    pushl   %edi
+    #rmmovl  %ebx, 4(%esp)   
+    #rmmovl  %edi, (%esp)
+    call    rmult           #rmult(x,y-1)
+    mrmovl    -4(%ebp), %eax
+
+endrmult:
+    popl    %ebx
+    popl    %edi
+    popl    %ebp
+    ret
+
+
+
+square:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+    #irmovl  $0, %eax
+    #subl    %edi, %eax
+    #jl      square2
+    jge     square2
+    
+    rmmovl    %edi, 4(%esp)
+
+    call    neg
+
+    mrmovl    -4(%ebp), %eax
+
+square2:
+    rmmovl    %edi, 4(%esp)
+    rmmovl    %edi, (%esp)
+    call    rmult
+    mrmovl    -4(%ebp), %eax
+    
+    popl    %edi
+    popl    %ebp
+    ret
+
+
+rfact:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+    irmovl  $1, %eax
+    subl    %edi, %eax
+    jl      elserfact       #if x == 1
+
+    irmovl  $1, %eax        #result = 1
+    jmp     endrfact
+
+elserfact:
+    irmovl  $1, %edx
+    rrmovl  %edi, %eax
+    subl    %edx, %eax
+    #rmmovl  %eax, 4(%esp)
+    pushl   %eax
+    pushl   %eax
+    call    rfact
+    mrmovl  -4(%ebp), %eax
+    #popl    %eax
+    #popl    %eax
+    
+    rmmovl  %edi, 4(%esp)
+    rmmovl  %eax, (%esp)
+    call    rmult
+    mrmovl  -4(%ebp), %eax
+
+endrfact:
+
+    popl    %edi
+    popl    %ebp
+    ret
+
+.align 4
+
+input:
+.long 4
+.long -9
+.long 13
+.long 0
+
+output:
+
+.pos 0x800
+stack:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.pos 0x0
+
+main:
+    irmovl  stack, %esp
+    irmovl  input, %esi
+    irmovl  output, %edi
+
+mainloop:
+    mrmovl  (%esi), %ecx
+
+    irmovl  $0, %edx
+    addl    %ecx, %edx
+    je      end
+
+    # add value of input to output
+    rmmovl  %ecx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+mainneg:
+    # call neg on input and add to output
+    irmovl  $0, %eax
+    rrmovl  %ecx, %ebx
+    pushl   %ebx
+    pushl   %ebx
+
+    call    neg
+
+    popl    %ebx
+    popl    %ebx
+
+    rmmovl  %eax, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+mainsquare:
+    # call square on input and add to output
+    rrmovl  %ecx, %ebx
+    pushl   %ebx
+    pushl   %ebx
+
+    call    square
+
+    popl    %ebx
+    popl    %ebx
+    
+    rmmovl  %eax, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+num2:
+    # if num2 is negative, call neg on it
+    rrmovl  %ecx, %ebx
+    irmovl  $0, %eax
+    subl    %ebx, %eax
+    jle     mainrfact
+
+    pushl   %ebx
+    pushl   %ebx
+
+    call    neg
+
+    popl    %ebx
+    popl    %ebx
+    
+    rrmovl  %eax, %ebx
+
+mainrfact:
+    # call rfact on num2 and add to output
+    irmovl  $1, %esi
+
+    pushl   %ebx
+    pushl   %ebx
+
+    call    rfact
+
+    popl    %ebx
+    popl    %ebx
+
+    rmmovl  %esi, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+status:
+    # set status to 0
+    irmovl  $0, %ebx
+
+status1prep:
+    # if num is odd, add one to status
+    irmovl  $1, %eax
+    andl    %ecx, %eax
+    je      status2prep
+
+status1:
+    irmovl  $1, %eax
+    addl    %eax, %ebx
+
+status2prep:
+    # if num is negative, add two to status
+    irmovl  $0, %eax
+    addl    %ecx, %eax
+    jge     status3prep
+
+status2:
+    irmovl  $2, %eax
+    addl    %eax, %ebx
+
+status3prep:
+    # call square on num
+    # if num squared is greater than 100, add four to status
+    rrmovl  %ecx, %esi
+
+    pushl   %esi
+    pushl   %esi
+
+    call    square
+
+    popl    %esi
+    popl    %esi
+    irmovl  $64, %edx
+    subl    %eax, %edx
+    jge     status4
+
+status3:
+    irmovl  $4, %eax
+    addl    %eax, %ebx
+
+status4:
+    # add 16 to status
+    irmovl  $10, %eax
+    addl    %eax, %ebx
+    
+    # add status to output
+    # add line of hex 1's to output
+    rmmovl  %ebx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+
+endloop:
+addl    %edx, %esi      # set new input address
+addl    %edx, %edi      # increment address in output
+
+jmp     mainloop
+
+end:
+    halt
+
+neg:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi   #int x
+
+    irmovl  $0, %eax        #int y = 0
+    subl    %edi, %eax      #y = y - x
+
+    popl    %edi
+
+    popl    %ebp
+
+    ret                     #return y
+
+rmult:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi            
+    pushl   %ebx            
+
+    mrmovl  8(%ebp), %edi   #int x
+    mrmovl  12(%ebp), %ebx  #int y
+    
+    
+
+    irmovl  $0, %esi
+    subl    %ebx, %esi      #int z = 0 - y
+    jne     elsermult       #if z == 0
+    jmp     endrmult
+
+elsermult:
+
+    addl    %edi, %eax
+
+    irmovl  $1, %esi        #else
+    subl    %esi, %ebx      
+    
+    pushl   %ebx
+    pushl   %edi
+    #rmmovl  %ebx, 4(%esp)   
+    #rmmovl  %edi, (%esp)
+    call    rmult           #rmult(x,y-1)
+    #mrmovl    -4(%ebp), %eax
+    popl    %edi
+    popl    %ebx
+
+endrmult:
+    popl    %ebx
+    popl    %edi
+    popl    %ebp
+    ret
+
+
+
+square:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+    irmovl  $0, %eax
+    subl    %edi, %eax
+    jl      square2
+    #jge     square2
+    
+    pushl    %edi
+    pushl    %edi
+
+    call    neg
+    
+    popl    %edi
+    popl    %edi
+
+    rrmovl  %eax, %edi
+
+square2:
+    irmovl  $0, %eax
+    pushl   %edi
+    pushl   %edi
+    call    rmult
+    popl    %edi
+    popl    %edi
+    
+    popl    %edi
+    popl    %ebp
+    ret
+
+
+rfact:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+    irmovl  $0, %edx
+    subl    %edi, %edx
+    jl      elserfact       #if x == 1
+    jmp     endrfact
+
+elserfact:
+    irmovl  $0, %eax
+    pushl   %edi
+    pushl   %esi
+    call    rmult
+    popl    %esi
+    popl    %edi
+
+    rrmovl  %eax, %esi
+    
+    irmovl  $1, %edx
+    subl    %edx, %edi
+    
+    pushl   %edi
+    pushl   %edi
+    call    rfact
+    popl    %edi
+    popl    %edi
+
+endrfact:
+
+    popl    %edi
+    popl    %ebp
+    ret
+
+.align 4
+
+input:
+.long 4
+.long -9
+.long 13
+.long 0
+
+output:
+
+.pos 0x800
+stack:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.pos 0x0
+
+main:
+    irmovl  stack, %esp
+    irmovl  input, %esi
+    irmovl  output, %edi
+
+mainloop:
+    mrmovl  (%esi), %ecx
+
+    irmovl  $0, %edx
+    addl    %ecx, %edx
+    je      end
+
+    # add value of input to output
+    rmmovl  %ecx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+mainneg:
+    # call neg on input and add to output
+    rrmovl  %ecx, %ebx
+    pushl   %ebx
+    pushl   %ebx
+
+    call    neg
+
+    popl    %ebx
+    popl    %ebx
+
+    rmmovl  %eax, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+mainsquare:
+    # call square on input and add to output
+    rrmovl  %ecx, %ebx
+    pushl   %ebx
+    pushl   %ebx
+
+    call    square
+
+    popl    %ebx
+    popl    %ebx
+    
+    rmmovl  %eax, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+num2:
+    # if num2 is negative, call neg on it
+    rrmovl  %ecx, %ebx
+    irmovl  $0, %eax
+    subl    %ebx, %eax
+    jle     mainrfact
+
+    pushl   %ebx
+    pushl   %ebx
+
+    call    neg
+
+    popl    %ebx
+    popl    %ebx
+    
+    rrmovl  %eax, %ebx
+
+mainrfact:
+    # call rfact on num2 and add to output
+    irmovl  $1, %edx
+
+    pushl   %ebx
+    pushl   %ebx
+
+    call    rfact
+
+    popl    %ebx
+    popl    %ebx
+
+    rmmovl  %edx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+status:
+    # set status to 0
+    irmovl  $0, %ebx
+
+status1prep:
+    # if num is odd, add one to status
+    irmovl  $1, %eax
+    andl    %ecx, %eax
+    je      status2prep
+
+status1:
+    irmovl  $1, %eax
+    addl    %eax, %ebx
+
+status2prep:
+    # if num is negative, add two to status
+    irmovl  $0, %eax
+    addl    %ecx, %eax
+    jge     status3prep
+
+status2:
+    irmovl  $2, %eax
+    addl    %eax, %ebx
+
+status3prep:
+    # call square on num
+    # if num squared is greater than 100, add four to status
+    rrmovl  %ecx, %ebx
+
+    pushl   %ebx
+    pushl   %ebx
+
+    call    square
+
+    popl    %ebx
+    popl    %ebx
+    irmovl  $64, %edx
+    subl    %eax, %edx
+    jge     status4
+
+status3:
+    irmovl  $4, %eax
+    addl    %eax, %ebx
+
+status4:
+    # add 16 to status
+    irmovl  $10, %eax
+    addl    %eax, %ebx
+    
+    # add status to output
+    # add line of hex 1's to output
+    rmmovl  %ebx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+
+endloop:
+addl    %edx, %esi      # set new input address
+addl    %edx, %edi      # increment address in output
+
+jmp     mainloop
+
+end:
+    halt
+
+neg:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi   #int x
+
+    irmovl  $0, %eax        #int y = 0
+    subl    %edi, %eax      #y = y - x
+
+    popl    %edi
+
+    popl    %ebp
+
+    ret                     #return y
+
+rmult:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi            
+    pushl   %ebx  
+    pushl   %esi
+
+    mrmovl  8(%ebp), %edi   #int x
+    mrmovl  12(%ebp), %ebx  #int y
+    
+
+    irmovl  $0, %esi
+    subl    %ebx, %esi      #int z = 0 - y
+    jne     elsermult       #if z == 0
+    jmp     endrmult
+
+elsermult:
+
+    addl    %edi, %eax
+
+    irmovl  $1, %esi        #else
+    subl    %esi, %ebx      
+    
+    pushl   %ebx
+    pushl   %edi
+    #rmmovl  %ebx, 4(%esp)   
+    #rmmovl  %edi, (%esp)
+    call    rmult           #rmult(x,y-1)
+    #mrmovl    -4(%ebp), %eax
+    popl    %edi
+    popl    %ebx
+
+endrmult:
+    popl    %esi
+    popl    %ebx
+    popl    %edi
+    popl    %ebp
+    ret
+
+
+
+square:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+
+    mrmovl  8(%ebp), %edi
+    irmovl  $0, %eax
+    subl    %edi, %eax
+    jl      square2
+    #jge     square2
+    
+    pushl    %edi
+    pushl    %edi
+
+    call    neg
+    
+    popl    %edi
+    popl    %edi
+
+    rrmovl  %eax, %edi
+
+square2:
+    irmovl  $0, %eax
+    pushl   %edi
+    pushl   %edi
+    call    rmult
+    popl    %edi
+    popl    %edi
+    
+    popl    %edi
+    popl    %ebp
+    ret
+
+
+rfact:
+    pushl   %ebp
+    rrmovl  %esp, %ebp
+
+    pushl   %edi
+    pushl   %esi
+
+    mrmovl  8(%ebp), %edi
+    irmovl  $0, %esi
+    subl    %edi, %esi
+    jl      elserfact       #if x == 1
+    jmp     endrfact
+
+elserfact:
+    irmovl  $0, %eax
+    pushl   %edi
+    pushl   %edx
+    call    rmult
+    popl    %edx
+    popl    %edi
+
+    rrmovl  %eax, %edx
+    
+    irmovl  $1, %esi
+    subl    %esi, %edi
+    
+    pushl   %edi
+    pushl   %edi
+    call    rfact
+    popl    %edi
+    popl    %edi
+
+endrfact:
+
+    popl    %esi
+    popl    %edi
+    popl    %ebp
+    ret
+
+.align 4
+
+input:
+.long 4
+.long -9
+.long 13
+.long 0
+
+output:
+
+.pos 0x800
+stack:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

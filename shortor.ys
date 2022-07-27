@@ -1,0 +1,281 @@
+.pos 0x0
+
+main:
+    irmovl  stack, %esp     # set stack ptr
+    irmovl  input, %esi     # input
+    irmovl  output, %edi    # output
+
+mainloop:
+    mrmovl  (%esi), %ecx    # %ecx holds values from input
+
+    irmovl  $0, %edx        # get ready to test value for 0
+    addl    %ecx, %edx      # add just to set condition codes
+    je      end             # val == 0, so skip to end
+
+    rmmovl  %ecx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+mainneg:
+    rrmovl  %ecx, %ebx      # copy %ecx's value to %ebx
+    pushl   %ebx            # save value
+    pushl   %ebx            # push value
+
+    call    neg
+
+    popl    %ebx            # pop argument
+    popl    %ebx            # restore value
+
+    rmmovl  %eax, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+mainsquare:
+    rrmovl  %ecx, %ebx      # copy %ecx's value to %ebx
+    pushl   %ebx            # save value
+    pushl   %ebx            # push value
+
+    call    square
+
+    popl    %ebx            # pop argument
+    popl    %ebx            # restore value
+    
+    rmmovl  %eax, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+num2:
+    rrmovl  %ecx, %ebx      # %ebx represents num2
+    irmovl  $0, %eax        # check to see if %ebx is negative
+    subl    %ebx, %eax
+    jle     mainrfact       # if not, skip to rfact section
+
+    pushl   %ebx            # save value
+    pushl   %ebx            # push value
+
+    call    neg
+
+    popl    %ebx            # pop argument
+    popl    %ebx            # restore value
+    
+    rrmovl  %eax, %ebx      # set %ebx equal to the return value
+
+mainrfact:
+    irmovl  $1, %edx        # set initial value for rfact
+
+    pushl   %ebx            # save value
+    pushl   %ebx            # push value
+
+    call    rfact
+
+    popl    %ebx            # pop argument
+    popl    %ebx            # restore value
+
+    rmmovl  %edx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+
+status:
+    irmovl  $0, %ebx        # set status to 0
+
+status1prep:
+    irmovl  $1, %eax        # check if %ecx is odd
+    andl    %ecx, %eax
+    je      status2prep     # if not, skip
+
+status1:
+    irmovl  0x1, %eax       # add 1 to status
+    addl    %eax, %ebx
+
+status2prep:
+    irmovl  $0, %eax        # check if %ecx is negative
+    addl    %ecx, %eax
+    jge     status3prep     # if not, skip
+
+status2:
+    irmovl  0x2, %eax       # add 2 to status
+    addl    %eax, %ebx
+
+status3prep:
+    rrmovl  %ecx, %edx      # move %ecx's value to %edx
+
+    pushl   %edx            # save value
+    pushl   %edx            # push value
+
+    call    square
+
+    popl    %edx            # pop argument
+    popl    %edx            # restore value
+    irmovl  0x64, %edx      # check to see if the value is greater than 100
+    subl    %eax, %edx      
+    jge     status4         # if not, skip
+
+status3:
+    irmovl  0x4, %eax       # add 4 to status
+    addl    %eax, %ebx
+
+status4:
+    irmovl  0x10, %eax      # add 16 to status
+    addl    %eax, %ebx
+    
+    rmmovl  %ebx, (%edi)    # store value in output
+
+    irmovl  $4, %edx
+    addl    %edx, %edi      # increment address in output
+    
+    irmovl  0x11111111, %eax
+    rmmovl  %eax, (%edi)    # store row of hex 1's in output
+
+endloop:
+    addl    %edx, %esi      # set new input address
+    addl    %edx, %edi      # increment address in output
+
+    jmp     mainloop
+
+end:
+    halt
+
+neg:
+    pushl   %ebp            # prologue
+    rrmovl  %esp, %ebp
+
+    pushl   %edi            # save %edi value
+
+    mrmovl  8(%ebp), %edi   # int x
+
+    irmovl  $0, %eax        # int y = 0
+    subl    %edi, %eax      # y = y - x
+
+    popl    %edi            # restore value
+
+    popl    %ebp            # epilogue
+    ret
+
+rmult:
+    pushl   %ebp            # prologue
+    rrmovl  %esp, %ebp
+
+    pushl   %edi            # save values    
+    pushl   %ebx  
+    pushl   %esi
+
+    mrmovl  8(%ebp), %edi   # int x
+    mrmovl  12(%ebp), %ebx  # int y
+    
+
+    irmovl  $0, %esi
+    subl    %ebx, %esi      # int z = 0 - y
+    jne     elsermult       # if z == 0
+    jmp     endrmult        # skip to end
+
+elsermult:                  # else
+
+    addl    %edi, %eax      # add value to result 
+
+    irmovl  $1, %esi        # decrement y
+    subl    %esi, %ebx      
+    
+    pushl   %ebx            # save value
+    pushl   %edi            # push value
+    call    rmult           #rmult(x,y-1)
+    popl    %edi            # pop argument
+    popl    %ebx            # restore value
+
+endrmult:
+    popl    %esi            # restore values
+    popl    %ebx
+    popl    %edi
+
+    popl    %ebp            # epilogue
+    ret
+
+square:
+    pushl   %ebp            # prologue
+    rrmovl  %esp, %ebp
+
+    pushl   %edi            # save value
+
+    mrmovl  8(%ebp), %edi   # val = param
+    irmovl  $0, %eax
+    subl    %edi, %eax      # check if less than 0
+    jl      square2         # if so, skip
+    
+    pushl    %edi           # save value
+    pushl    %edi           # push value
+
+    call    neg             
+    
+    popl    %edi            # pop argument
+    popl    %edi            # restore value
+
+    rrmovl  %eax, %edi      # val = return value
+
+square2:
+    irmovl  $0, %eax        # prepare return value
+    pushl   %edi            # save value
+    pushl   %edi            # push value
+    call    rmult
+    popl    %edi            # pop argument
+    popl    %edi            # restore value
+    
+    popl    %edi            # restore value
+    popl    %ebp            # epilogue
+    ret
+
+
+rfact:
+    pushl   %ebp            # prologue
+    rrmovl  %esp, %ebp
+
+    pushl   %edi            # save values
+    pushl   %esi
+
+    mrmovl  8(%ebp), %edi   # val = param
+    irmovl  $0, %esi
+    subl    %edi, %esi
+    jl      elserfact       # if x != 0
+    jmp     endrfact        # else
+
+elserfact:
+    irmovl  $0, %eax        # prepare return value
+    pushl   %edi            # save value
+    pushl   %edx            # push value
+    call    rmult       
+    popl    %edx            # pop argument
+    popl    %edi            # restore value
+
+    rrmovl  %eax, %edx      # set %edx equal to return value
+    
+    irmovl  $1, %esi        # decrement %edi
+    subl    %esi, %edi
+    
+    pushl   %edi            # save value
+    pushl   %edi            # push value
+    call    rfact
+    popl    %edi            # pop argument
+    popl    %edi            # restore value
+
+endrfact:
+
+    popl    %esi            # restore values
+    popl    %edi
+    popl    %ebp            # epilogue
+    ret
+
+.align 4
+
+input:
+.long 4
+.long -9
+.long 13
+.long 0
+
+output:
+
+.pos 0x800
+stack:
+
